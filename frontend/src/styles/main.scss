@@ -340,6 +340,191 @@ input {
   min-height: 100vh;
 }
 
+.main-panel.voice-panel {
+  grid-template-rows: auto 1fr;
+}
+
+// Voice lobby (pre-join)
+.voice-lobby {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 0.75rem;
+  background: radial-gradient(ellipse at 50% 40%, #1e2d50 0%, #0e131d 70%);
+}
+
+.voice-lobby-icon {
+  color: var(--muted);
+  opacity: 0.7;
+  margin-bottom: 0.5rem;
+}
+
+.voice-lobby-name {
+  margin: 0;
+  font-size: 1.6rem;
+  font-family: "Space Grotesk", sans-serif;
+  color: var(--text);
+}
+
+.voice-lobby-sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.join-voice-btn {
+  margin-top: 0.75rem;
+  padding: 0.65rem 2.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: transparent;
+  color: var(--text);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+// Voice room (in-call)
+.voice-room {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: #111827;
+}
+
+.voice-participants {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 4px;
+  padding: 4px;
+  background: #111827;
+  align-content: center;
+  min-height: 0;
+  overflow: auto;
+}
+
+.voice-tile {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #2a3347;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.no-video {
+    background: #1e2a3e;
+  }
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.voice-avatar-big {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #4a5578;
+  display: grid;
+  place-items: center;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text);
+  border: 3px solid rgba(255, 255, 255, 0.15);
+}
+
+.voice-tile-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.72));
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+// Bottom voice controls bar
+.voice-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  background: #1a2030;
+  border-top: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.vc-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #4a5568;
+  color: var(--text);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background 0.15s, transform 0.1s;
+
+  &:hover {
+    background: #5a6680;
+    transform: scale(1.05);
+  }
+
+  &.vc-muted {
+    background: #dc2626;
+
+    &:hover { background: #b91c1c; }
+  }
+
+  &.vc-active {
+    background: var(--accent);
+    color: #062014;
+
+    &:hover { filter: brightness(1.1); }
+  }
+
+  &.vc-end {
+    background: #dc2626;
+    width: 50px;
+    height: 50px;
+
+    &:hover { background: #b91c1c; }
+  }
+}
+
+// Top-bar channel icon alignment
+.top-bar-channel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.channel-type-icon {
+  color: var(--muted);
+}
+
 .top-bar {
   padding: 0.95rem 1.1rem;
   border-bottom: 1px solid var(--line);
@@ -574,23 +759,247 @@ input {
   }
 }
 
+// ─── Hamburger menu button (hidden on desktop) ───────────────────────────────
+.menu-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  flex-shrink: 0;
+
+  &:hover { background: #202e48; }
+}
+
+// ─── Sidebar close button (always rendered, layout handled via CSS) ──────────
+.sidebar-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: none;
+  align-items: center;
+
+  &:hover { color: var(--text); }
+}
+
+// ─── Mobile backdrop ─────────────────────────────────────────────────────────
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 199;
+}
+
+// ─── Tablet (≤ 980px) ────────────────────────────────────────────────────────
 @media (max-width: 980px) {
   .workspace-grid {
     grid-template-columns: 64px 220px minmax(0, 1fr);
   }
+
+  .voice-participants {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
 }
 
+// ─── Mobile (≤ 760px) ────────────────────────────────────────────────────────
 @media (max-width: 760px) {
+  // Layout: server sidebar + main panel only
   .workspace-grid {
-    grid-template-columns: 58px minmax(0, 1fr);
+    grid-template-columns: 52px minmax(0, 1fr);
+    position: relative;
   }
 
+  // Server sidebar — slimmer
+  .server-sidebar {
+    padding: 0.75rem 0.35rem;
+    gap: 0.75rem;
+  }
+
+  .server-pill {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .brand {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+  }
+
+  // Channel sidebar — hidden by default, slide in as drawer
   .channel-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 260px;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+
+    &.open {
+      transform: translateX(0);
+    }
+  }
+
+  // Show close button inside sidebar on mobile
+  .sidebar-close-btn {
+    display: flex;
+  }
+
+  // Show backdrop when sidebar is open
+  .sidebar-open .sidebar-backdrop {
+    display: block;
+  }
+
+  // Show hamburger button
+  .menu-btn {
+    display: flex;
+  }
+
+  // Top bar — tighter
+  .top-bar {
+    padding: 0.7rem 0.85rem;
+    gap: 0.5rem;
+  }
+
+  .top-bar h2 {
+    font-size: 0.95rem;
+  }
+
+  .top-bar small {
     display: none;
   }
 
+  // Top-bar actions — icon-only
+  .top-actions {
+    gap: 0.35rem;
+  }
+
   .top-actions button {
-    padding: 0.45rem;
+    padding: 0.45rem 0.5rem;
     font-size: 0;
+    gap: 0;
+
+    svg { font-size: initial; }
+  }
+
+  // Message composer
+  .composer {
+    padding: 0.6rem 0.75rem 0.85rem;
+    gap: 0.5rem;
+  }
+
+  // Message list
+  .message-list {
+    padding: 0.75rem;
+  }
+
+  // Images / videos — full width
+  .msg-img {
+    max-width: 100%;
+  }
+
+  .msg-video {
+    max-width: 100%;
+  }
+
+  // Voice lobby
+  .voice-lobby-name {
+    font-size: 1.25rem;
+    text-align: center;
+    padding: 0 1rem;
+  }
+
+  .voice-lobby-sub {
+    text-align: center;
+    padding: 0 1rem;
+  }
+
+  // Voice participants — single column
+  .voice-participants {
+    grid-template-columns: 1fr;
+    padding: 2px;
+    gap: 2px;
+  }
+
+  .voice-tile {
+    aspect-ratio: 4 / 3;
+  }
+
+  // Voice controls bar — spacing
+  .voice-controls-bar {
+    padding: 0.65rem 0.75rem;
+    gap: 0.4rem;
+  }
+
+  .vc-btn {
+    width: 40px;
+    height: 40px;
+
+    &.vc-end {
+      width: 44px;
+      height: 44px;
+    }
+  }
+
+  // Avatar smaller on mobile
+  .voice-avatar-big {
+    width: 60px;
+    height: 60px;
+    font-size: 1.7rem;
+  }
+
+  // Call dock
+  .call-dock {
+    margin: 0 0.5rem 0.75rem;
+  }
+
+  // Media grid
+  .media-grid {
+    grid-template-columns: 1fr;
+    padding: 0 0.75rem 0.75rem;
+  }
+}
+
+// ─── Very small (≤ 420px) ────────────────────────────────────────────────────
+@media (max-width: 420px) {
+  .workspace-grid {
+    grid-template-columns: 46px minmax(0, 1fr);
+  }
+
+  .server-pill {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+  }
+
+  .brand {
+    width: 32px;
+    height: 32px;
+  }
+
+  .voice-controls-bar {
+    gap: 0.3rem;
+  }
+
+  .vc-btn {
+    width: 36px;
+    height: 36px;
+
+    &.vc-end {
+      width: 40px;
+      height: 40px;
+    }
   }
 }

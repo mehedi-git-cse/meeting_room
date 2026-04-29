@@ -20,6 +20,8 @@ export const ChannelSidebar = ({
   onSelectChannel,
   onCreateChannel,
   onAddMember,
+  onClose,
+  isOpen,
   currentServerId,
   currentUserRole
 }) => {
@@ -62,19 +64,24 @@ export const ChannelSidebar = ({
   };
 
   return (
-    <aside className="channel-sidebar">
+    <aside className={clsx("channel-sidebar", { open: isOpen })}>
       <div className="channel-sidebar-header">
         <h2>Channels</h2>
-        {canManage && (
-          <div className="channel-actions">
-            <button type="button" title="Add Member" onClick={() => { setShowAddMember(true); setMemberError(""); setMemberSuccess(""); }}>
-              <UserPlus size={15} />
-            </button>
-            <button type="button" title="New Channel" onClick={() => setShowCreateChannel(true)}>
-              <Plus size={15} />
-            </button>
-          </div>
-        )}
+        <div className="channel-actions">
+          {canManage && (
+            <>
+              <button type="button" title="Add Member" onClick={() => { setShowAddMember(true); setMemberError(""); setMemberSuccess(""); }}>
+                <UserPlus size={15} />
+              </button>
+              <button type="button" title="New Channel" onClick={() => setShowCreateChannel(true)}>
+                <Plus size={15} />
+              </button>
+            </>
+          )}
+          <button type="button" className="sidebar-close-btn" title="Close" onClick={onClose}>
+            <X size={15} />
+          </button>
+        </div>
       </div>
 
       <ul>
