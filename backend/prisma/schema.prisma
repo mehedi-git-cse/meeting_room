@@ -1,0 +1,164 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ChannelType {
+  TEXT
+  VOICE
+}
+
+enum MemberRole {
+  ADMIN
+  MODERATOR
+  MEMBER
+}
+
+enum PresenceStatus {
+  ONLINE
+  OFFLINE
+  AWAY
+  DND
+}
+
+model User {
+  id            String           @id @default(cuid())
+  email         String           @unique
+  username      String           @unique
+  passwordHash  String
+  avatarUrl     String?
+  statusMessage String?
+  status        PresenceStatus   @default(OFFLINE)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  refreshTokens RefreshToken[]
+  ownedServers  Server[]
+  memberships   ServerMember[]
+  sentMessages  Message[]
+  reactions     MessageReaction[]
+  dmParts       DMParticipant[]
+  dmMessages    DMMessage[]
+  readReceipts  MessageReadReceipt[]
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  tokenHash String
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Server {
+  id          String         @id @default(cuid())
+  name        String
+  iconUrl     String?
+  ownerId     String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  owner       User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members     ServerMember[]
+  channels    Channel[]
+}
+
+model ServerMember {
+  id        String     @id @default(cuid())
+  userId    String
+  serverId  String
+  role      MemberRole @default(MEMBER)
+  createdAt DateTime   @default(now())
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  server    Server     @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, serverId])
+  @@index([serverId])
+}
+
+model Channel {
+  id        String      @id @default(cuid())
+  name      String
+  type      ChannelType @default(TEXT)
+  serverId  String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  server    Server      @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@index([serverId])
+}
+
+model Message {
+  id         String               @id @default(cuid())
+  content    String
+  channelId  String
+  authorId   String
+  isEdited   Boolean              @default(false)
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+  channel    Channel              @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  author     User                 @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reactions  MessageReaction[]
+  receipts   MessageReadReceipt[]
+}
+
+model MessageReaction {
+  id        String   @id @default(cuid())
+  emoji     String
+  messageId String
+  userId    String
+  createdAt DateTime @default(now())
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
+}
+
+model MessageReadReceipt {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  readAt    DateTime @default(now())
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+}
+
+model DMConversation {
+  id           String          @id @default(cuid())
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  participants DMParticipant[]
+  messages     DMMessage[]
+}
+
+model DMParticipant {
+  id             String         @id @default(cuid())
+  conversationId String
+  userId         String
+  conversation   DMConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model DMMessage {
+  id             String         @id @default(cuid())
+  content        String
+  conversationId String
+  senderId       String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  conversation   DMConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User           @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+}

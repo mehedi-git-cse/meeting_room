@@ -1,0 +1,49 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Discord-like realtime backend",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "test": "node --test",
+    "check": "node --check src/server.js ; node --check src/app.js ; node --check src/socket/index.js"
+  },
+  "keywords": [
+    "express",
+    "socket-io",
+    "webrtc",
+    "chat"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1037.0",
+    "@prisma/client": "^6.18.0",
+    "@socket.io/redis-adapter": "^8.3.0",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "helmet": "^8.1.0",
+    "ioredis": "^5.8.2",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.2",
+    "prisma": "^6.18.0",
+    "socket.io": "^4.8.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "supertest": "^7.2.2"
+  }
+}

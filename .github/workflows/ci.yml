@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend-check:
+    name: Backend – syntax + tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: openmeeting_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Syntax check
+        run: |
+          node --check src/server.js
+          node --check src/app.js
+          node --check src/socket/index.js
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Push schema to test DB
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/openmeeting_test
+        run: npx prisma db push --skip-generate
+
+      - name: Run integration tests
+        env:
+          NODE_ENV: test
+          PORT: 4001
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/openmeeting_test
+          JWT_ACCESS_SECRET: ci-access-secret-32-chars-minimum!!
+          JWT_REFRESH_SECRET: ci-refresh-secret-32-chars-minimum!
+          JWT_ACCESS_TTL: 15m
+          JWT_REFRESH_TTL: 7d
+          CLIENT_ORIGIN: http://localhost:5173
+          UPLOAD_MODE: local
+          REDIS_URL: redis://localhost:6379
+        run: npm test
+
+  frontend-build:
+    name: Frontend – build
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Production build
+        env:
+          VITE_API_BASE_URL: http://localhost:4000/api
+          VITE_SOCKET_URL: http://localhost:4000
+        run: npm run build
